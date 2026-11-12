@@ -1,0 +1,471 @@
+
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f4ff" />
+    <title>오늘의 고민 룰렛</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        color: #24213a;
+        background: #f6f4ff;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        --purple: #7657e8;
+        --purple-dark: #5e40ce;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        padding: 48px 20px;
+        background:
+          radial-gradient(ellipse at 50% 0%, #e8e2ff 0, transparent 48%),
+          #f6f4ff;
+      }
+
+      button,
+      textarea {
+        font: inherit;
+      }
+
+      .app {
+        width: min(100%, 980px);
+        margin: 0 auto;
+      }
+
+      .header {
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--purple-dark);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 6vw, 46px);
+        letter-spacing: -0.06em;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        color: #77738c;
+        font-size: 16px;
+      }
+
+      .game {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        align-items: center;
+        gap: clamp(24px, 5vw, 60px);
+        padding: clamp(22px, 5vw, 48px);
+        border: 1px solid #eeebf7;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 24px 70px #47358b14;
+      }
+
+      .wheel-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .wheel-wrap {
+        position: relative;
+        width: min(100%, 440px);
+        aspect-ratio: 1;
+        padding: 10px;
+        border: 1px solid #eeeaf9;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 14px 34px #30205d1c;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+
+      .pointer {
+        position: absolute;
+        z-index: 1;
+        top: -3px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-top: 0;
+        border-right: 17px solid transparent;
+        border-bottom: 32px solid #30245f;
+        border-left: 17px solid transparent;
+        filter: drop-shadow(0 3px 2px #2419573b);
+        transform: translateX(-50%) rotate(180deg);
+      }
+
+      .wheel-hint {
+        margin: 20px 0 0;
+        color: #89859a;
+        font-size: 13px;
+      }
+
+      .controls h2 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        letter-spacing: -0.04em;
+      }
+
+      .instructions {
+        margin: 0 0 16px;
+        color: #77738c;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 194px;
+        padding: 14px 16px;
+        resize: vertical;
+        border: 1px solid #e6e2f1;
+        border-radius: 14px;
+        outline: none;
+        background: #fcfbff;
+        color: #353149;
+        font-size: 15px;
+        line-height: 1.8;
+        transition: border-color 160ms, box-shadow 160ms;
+      }
+
+      textarea:focus {
+        border-color: #9c87f1;
+        box-shadow: 0 0 0 4px #7657e81a;
+      }
+
+      .item-count {
+        min-height: 20px;
+        margin: 8px 2px 18px;
+        color: #89859a;
+        font-size: 12px;
+      }
+
+      .spin-button {
+        width: 100%;
+        min-height: 56px;
+        border: 0;
+        border-radius: 15px;
+        background: var(--purple);
+        color: #fff;
+        cursor: pointer;
+        font-size: 17px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px #7657e83b;
+        transition: background 160ms, transform 160ms, box-shadow 160ms;
+      }
+
+      .spin-button:hover:not(:disabled) {
+        background: var(--purple-dark);
+        box-shadow: 0 10px 22px #7657e84a;
+        transform: translateY(-1px);
+      }
+
+      .spin-button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .spin-button:focus-visible {
+        outline: 3px solid #b9aafa;
+        outline-offset: 3px;
+      }
+
+      .spin-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .result {
+        min-height: 76px;
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid #eeeafd;
+        border-radius: 15px;
+        background: #f8f6ff;
+        text-align: center;
+      }
+
+      .result-label {
+        display: block;
+        margin-bottom: 4px;
+        color: #89859a;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .result-value {
+        display: block;
+        overflow-wrap: anywhere;
+        color: var(--purple-dark);
+        font-size: 21px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .result.is-winner {
+        border-color: #ded5ff;
+        animation: celebrate 500ms ease-out;
+      }
+
+      @keyframes celebrate {
+        50% { transform: scale(1.035); }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 32px 16px;
+        }
+
+        .header {
+          margin-bottom: 22px;
+        }
+
+        .game {
+          grid-template-columns: 1fr;
+          gap: 30px;
+          padding: 24px;
+        }
+
+        .wheel-wrap {
+          width: min(100%, 360px);
+        }
+
+        .controls {
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <p class="eyebrow">DECISION TIME</p>
+        <h1>오늘의 고민 룰렛</h1>
+        <p class="subtitle">고민은 룰렛에게 맡기고, 가볍게 돌려봐요!</p>
+      </header>
+
+      <section class="game" aria-label="고민 룰렛 게임">
+        <div class="wheel-column">
+          <div class="wheel-wrap">
+            <span class="pointer" aria-hidden="true"></span>
+            <canvas id="wheel" role="img" aria-label="선택 항목이 표시된 룰렛"></canvas>
+          </div>
+          <p class="wheel-hint">화살표가 가리키는 항목이 오늘의 선택!</p>
+        </div>
+
+        <div class="controls">
+          <h2>무엇이 고민인가요?</h2>
+          <p class="instructions">룰렛에 넣을 내용을 한 줄에 하나씩 적어주세요. 두 개 이상이면 돌릴 수 있어요.</p>
+          <label for="options" class="visually-hidden">룰렛 항목, 한 줄에 하나씩 입력</label>
+          <textarea id="options" spellcheck="false" aria-describedby="item-count"></textarea>
+          <p class="item-count" id="item-count" aria-live="polite"></p>
+          <button class="spin-button" id="spin" type="button">🎯 룰렛 돌리기</button>
+          <div class="result" id="result" role="status" aria-live="polite">
+            <span class="result-label">오늘의 선택</span>
+            <span class="result-value" id="result-value">룰렛을 돌려보세요!</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <style>
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+    <script>
+      const defaultOptions = ["맛있는 거 먹기", "영화 보기", "산책하기", "카페 가기", "집에서 쉬기", "게임하기"];
+      const colors = ["#ffb8a8", "#ffd77d", "#a9dfc6", "#9ed8ed", "#b8abf5", "#f4a8cc", "#f6bb75", "#9fc9a2"];
+      const canvas = document.querySelector("#wheel");
+      const context = canvas.getContext("2d");
+      const textarea = document.querySelector("#options");
+      const spinButton = document.querySelector("#spin");
+      const itemCount = document.querySelector("#item-count");
+      const result = document.querySelector("#result");
+      const resultValue = document.querySelector("#result-value");
+      let options = [];
+      let rotation = 0;
+      let spinning = false;
+
+      try {
+        textarea.value = localStorage.getItem("roulette-options") || defaultOptions.join("\n");
+      } catch {
+        textarea.value = defaultOptions.join("\n");
+      }
+
+      function getOptions() {
+        return textarea.value.split("\n").map((item) => item.trim()).filter(Boolean);
+      }
+
+      function drawWheel() {
+        const bounds = canvas.getBoundingClientRect();
+        if (!bounds.width) return;
+        const pixelRatio = window.devicePixelRatio || 1;
+        canvas.width = Math.round(bounds.width * pixelRatio);
+        canvas.height = Math.round(bounds.height * pixelRatio);
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        const size = bounds.width;
+        const center = size / 2;
+        const radius = center - 3;
+        context.clearRect(0, 0, size, size);
+
+        if (!options.length) {
+          context.beginPath();
+          context.arc(center, center, radius, 0, Math.PI * 2);
+          context.fillStyle = "#f1eff7";
+          context.fill();
+          context.fillStyle = "#89859a";
+          context.font = "600 15px sans-serif";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText("항목을 입력해주세요", center, center);
+          return;
+        }
+
+        const slice = (Math.PI * 2) / options.length;
+        const startOffset = -Math.PI / 2 + rotation;
+
+        options.forEach((option, index) => {
+          const start = startOffset + index * slice;
+          const end = start + slice;
+          context.beginPath();
+          context.moveTo(center, center);
+          context.arc(center, center, radius, start, end);
+          context.closePath();
+          context.fillStyle = colors[index % colors.length];
+          context.fill();
+          context.strokeStyle = "#ffffff";
+          context.lineWidth = 2;
+          context.stroke();
+
+          context.save();
+          context.translate(center, center);
+          context.rotate(start + slice / 2);
+          context.textAlign = "right";
+          context.textBaseline = "middle";
+          context.fillStyle = "#302b43";
+          context.font = `700 ${Math.max(11, Math.min(16, 200 / options.length))}px sans-serif`;
+          const label = option.length > 12 ? `${option.slice(0, 11)}…` : option;
+          context.fillText(label, radius * 0.83, 0, radius * 0.52);
+          context.restore();
+        });
+
+        context.beginPath();
+        context.arc(center, center, 8, 0, Math.PI * 2);
+        context.fillStyle = "#fff";
+        context.fill();
+        context.strokeStyle = "#eeeaf9";
+        context.lineWidth = 2;
+        context.stroke();
+      }
+
+      function updateOptions() {
+        options = getOptions();
+        itemCount.textContent = `${options.length}개 항목${options.length < 2 ? " · 2개 이상 입력해주세요" : ""}`;
+        spinButton.disabled = options.length < 2 || spinning;
+        result.classList.remove("is-winner");
+        drawWheel();
+        try {
+          localStorage.setItem("roulette-options", textarea.value);
+        } catch {
+          // The game remains usable when browser storage is unavailable.
+        }
+      }
+
+      function spin() {
+        if (spinning || options.length < 2) return;
+        spinning = true;
+        spinButton.disabled = true;
+        textarea.disabled = true;
+        spinButton.textContent = "✨ 룰렛이 돌아가는 중...";
+        result.classList.remove("is-winner");
+        resultValue.textContent = "두근두근...";
+
+        const slice = (Math.PI * 2) / options.length;
+        const selectedIndex = Math.floor(Math.random() * options.length);
+        const targetRotation = (((-(selectedIndex + 0.5) * slice) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const currentRotation = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const extraRotation = (7 + Math.floor(Math.random() * 3)) * Math.PI * 2;
+        const distance = extraRotation + ((targetRotation - currentRotation + Math.PI * 2) % (Math.PI * 2));
+        const startRotation = rotation;
+        const duration = 4600;
+        const startTime = performance.now();
+
+        function animate(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 4);
+          rotation = startRotation + distance * eased;
+          drawWheel();
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+            return;
+          }
+
+          rotation = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          drawWheel();
+          spinning = false;
+          textarea.disabled = false;
+          spinButton.disabled = options.length < 2;
+          spinButton.textContent = "🎯 다시 돌리기";
+          resultValue.textContent = options[selectedIndex];
+          result.classList.remove("is-winner");
+          void result.offsetWidth;
+          result.classList.add("is-winner");
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      textarea.addEventListener("input", updateOptions);
+      spinButton.addEventListener("click", spin);
+      new ResizeObserver(drawWheel).observe(canvas);
+      updateOptions();
+    </script>
+  </body>
+</html>
