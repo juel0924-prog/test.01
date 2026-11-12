@@ -11,13 +11,44 @@
       :root {
         color-scheme: light;
         font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-        color: #24213a;
-        background: #f6f4ff;
+        color: var(--text);
+        background: var(--page-bg);
         font-synthesis: none;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         --purple: #7657e8;
         --purple-dark: #5e40ce;
+        --page-bg: #f6f4ff;
+        --page-glow: #e8e2ff;
+        --surface: #fff;
+        --field-bg: #fcfbff;
+        --text: #24213a;
+        --muted: #77738c;
+        --subtle: #89859a;
+        --border: #eeebf7;
+        --wheel-border: #eeeaf9;
+        --field-border: #e6e2f1;
+        --result-bg: #f8f6ff;
+        --result-border: #eeeafd;
+        --winner-border: #ded5ff;
+      }
+
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --purple-dark: #c1b2ff;
+        --page-bg: #171521;
+        --page-glow: #272139;
+        --surface: #211e2c;
+        --field-bg: #292536;
+        --text: #f4f1fb;
+        --muted: #c0bbce;
+        --subtle: #aaa4ba;
+        --border: #383344;
+        --wheel-border: #454052;
+        --field-border: #484257;
+        --result-bg: #2a2638;
+        --result-border: #40394f;
+        --winner-border: #7657e8;
       }
 
       * {
@@ -30,13 +61,46 @@
         margin: 0;
         padding: 48px 20px;
         background:
-          radial-gradient(ellipse at 50% 0%, #e8e2ff 0, transparent 48%),
-          #f6f4ff;
+          radial-gradient(ellipse at 50% 0%, var(--page-glow) 0, transparent 48%),
+          var(--page-bg);
+        color: var(--text);
+        transition: background-color 180ms, color 180ms;
       }
 
       button,
       textarea {
         font: inherit;
+      }
+
+      .header-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        transition: background 160ms, border-color 160ms;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--purple);
+      }
+
+      .theme-toggle:focus-visible {
+        outline: 3px solid #b9aafa;
+        outline-offset: 3px;
       }
 
       .app {
@@ -65,7 +129,7 @@
 
       .subtitle {
         margin: 12px 0 0;
-        color: #77738c;
+        color: var(--muted);
         font-size: 16px;
       }
 
@@ -75,9 +139,9 @@
         align-items: center;
         gap: clamp(24px, 5vw, 60px);
         padding: clamp(22px, 5vw, 48px);
-        border: 1px solid #eeebf7;
+        border: 1px solid var(--border);
         border-radius: 28px;
-        background: #fff;
+        background: var(--surface);
         box-shadow: 0 24px 70px #47358b14;
       }
 
@@ -92,9 +156,9 @@
         width: min(100%, 440px);
         aspect-ratio: 1;
         padding: 10px;
-        border: 1px solid #eeeaf9;
+        border: 1px solid var(--wheel-border);
         border-radius: 50%;
-        background: #fff;
+        background: var(--surface);
         box-shadow: 0 14px 34px #30205d1c;
       }
 
@@ -122,7 +186,7 @@
 
       .wheel-hint {
         margin: 20px 0 0;
-        color: #89859a;
+        color: var(--subtle);
         font-size: 13px;
       }
 
@@ -134,7 +198,7 @@
 
       .instructions {
         margin: 0 0 16px;
-        color: #77738c;
+        color: var(--muted);
         font-size: 14px;
         line-height: 1.6;
       }
@@ -145,11 +209,11 @@
         min-height: 194px;
         padding: 14px 16px;
         resize: vertical;
-        border: 1px solid #e6e2f1;
+        border: 1px solid var(--field-border);
         border-radius: 14px;
         outline: none;
-        background: #fcfbff;
-        color: #353149;
+        background: var(--field-bg);
+        color: var(--text);
         font-size: 15px;
         line-height: 1.8;
         transition: border-color 160ms, box-shadow 160ms;
@@ -163,7 +227,7 @@
       .item-count {
         min-height: 20px;
         margin: 8px 2px 18px;
-        color: #89859a;
+        color: var(--subtle);
         font-size: 12px;
       }
 
@@ -205,16 +269,16 @@
         min-height: 76px;
         margin-top: 18px;
         padding: 14px 16px;
-        border: 1px solid #eeeafd;
+        border: 1px solid var(--result-border);
         border-radius: 15px;
-        background: #f8f6ff;
+        background: var(--result-bg);
         text-align: center;
       }
 
       .result-label {
         display: block;
         margin-bottom: 4px;
-        color: #89859a;
+        color: var(--subtle);
         font-size: 12px;
         font-weight: 700;
       }
@@ -229,7 +293,7 @@
       }
 
       .result.is-winner {
-        border-color: #ded5ff;
+        border-color: var(--winner-border);
         animation: celebrate 500ms ease-out;
       }
 
@@ -276,6 +340,12 @@
   <body>
     <main class="app">
       <header class="header">
+        <div class="header-toolbar">
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="다크 모드로 전환">
+            <span id="theme-icon" aria-hidden="true">🌙</span>
+            <span id="theme-label">다크 모드</span>
+          </button>
+        </div>
         <p class="eyebrow">DECISION TIME</p>
         <h1>오늘의 고민 룰렛</h1>
         <p class="subtitle">고민은 룰렛에게 맡기고, 가볍게 돌려봐요!</p>
@@ -327,6 +397,9 @@
       const itemCount = document.querySelector("#item-count");
       const result = document.querySelector("#result");
       const resultValue = document.querySelector("#result-value");
+      const themeToggle = document.querySelector("#theme-toggle");
+      const themeIcon = document.querySelector("#theme-icon");
+      const themeLabel = document.querySelector("#theme-label");
       let options = [];
       let rotation = 0;
       let spinning = false;
@@ -357,9 +430,9 @@
         if (!options.length) {
           context.beginPath();
           context.arc(center, center, radius, 0, Math.PI * 2);
-          context.fillStyle = "#f1eff7";
+          context.fillStyle = document.documentElement.dataset.theme === "dark" ? "#2a2638" : "#f1eff7";
           context.fill();
-          context.fillStyle = "#89859a";
+          context.fillStyle = document.documentElement.dataset.theme === "dark" ? "#aaa4ba" : "#89859a";
           context.font = "600 15px sans-serif";
           context.textAlign = "center";
           context.textBaseline = "middle";
@@ -399,7 +472,7 @@
         context.arc(center, center, 8, 0, Math.PI * 2);
         context.fillStyle = "#fff";
         context.fill();
-        context.strokeStyle = "#eeeaf9";
+        context.strokeStyle = document.documentElement.dataset.theme === "dark" ? "#625a73" : "#eeeaf9";
         context.lineWidth = 2;
         context.stroke();
       }
@@ -414,6 +487,24 @@
           localStorage.setItem("roulette-options", textarea.value);
         } catch {
           // The game remains usable when browser storage is unavailable.
+        }
+      }
+
+      function setTheme(theme, save = false) {
+        const isDark = theme === "dark";
+        document.documentElement.dataset.theme = isDark ? "dark" : "light";
+        themeToggle.setAttribute("aria-label", isDark ? "화이트 모드로 전환" : "다크 모드로 전환");
+        themeIcon.textContent = isDark ? "☀️" : "🌙";
+        themeLabel.textContent = isDark ? "화이트 모드" : "다크 모드";
+        document.querySelector('meta[name="theme-color"]').content = isDark ? "#171521" : "#f6f4ff";
+        drawWheel();
+
+        if (save) {
+          try {
+            localStorage.setItem("roulette-theme", isDark ? "dark" : "light");
+          } catch {
+            // The theme can still be changed for the current page.
+          }
         }
       }
 
@@ -464,7 +555,17 @@
 
       textarea.addEventListener("input", updateOptions);
       spinButton.addEventListener("click", spin);
+      themeToggle.addEventListener("click", () => {
+        setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+      });
       new ResizeObserver(drawWheel).observe(canvas);
+      let savedTheme = "light";
+      try {
+        savedTheme = localStorage.getItem("roulette-theme") === "dark" ? "dark" : "light";
+      } catch {
+        savedTheme = "light";
+      }
+      setTheme(savedTheme);
       updateOptions();
     </script>
   </body>
